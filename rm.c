@@ -1,62 +1,99 @@
-#include "rm.h"
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdio.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include "rm.h"
 
-int num_threads;
-int num_resource_types;
-int existing_resources[MAXR];
-bool deadlock_avoidance;
+int DA; // indicates if deadlocks will be avoided or not
+int N; // number of processes
+int M; // number of resource types
+int ExistingRes[MAXR]; // Existing resources vector
 
-int rm_init(int p_count, int r_count, int r_exist[], int avoid) {
-    if (p_count <= 0 || p_count > MAXP || r_count <= 0 || r_count > MAXR || (avoid != 0 && avoid != 1)) {
-        return -1;
-    }
+pthread_mutex_t resource_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-    num_threads = p_count;
-    num_resource_types = r_count;
-    for (int i = 0; i < r_count; i++) {
-        if (r_exist[i] < 0) {
-            return -1;
-        }
-        existing_resources[i] = r_exist[i];
-    }
-
-    deadlock_avoidance = avoid == 1;
-
-    return 0;
-}
+// Additional matrices for deadlock avoidance
+int Allocation[MAXP][MAXR];
+int Maximum[MAXP][MAXR];
+int Need[MAXP][MAXR];
 
 int rm_thread_started(int tid) {
-    // Implement the function to handle a new thread starting
-    return 0;
+    int ret = 0;
+    if (tid >= 0 && tid < N) {
+        ret = 1;
+    }
+    return ret;
 }
 
 int rm_thread_ended() {
-    // Implement the function to handle a thread ending
-    return 0;
+    int ret = 0;
+    // Implement logic to clean up when a thread ends, if necessary
+    return ret;
 }
 
 int rm_claim(int claim[]) {
-    // Implement the function to handle resource claim for deadlock avoidance
-    return 0;
+    int ret = 0;
+    pthread_mutex_lock(&resource_mutex);
+    for (int i = 0; i < M; i++) {
+        if (claim[i] < 0 || claim[i] > ExistingRes[i]) {
+            ret = -1;
+            break;
+        }
+        Maximum[0][i] = claim[i];
+        Need[0][i] = claim[i] - Allocation[0][i];
+    }
+    pthread_mutex_unlock(&resource_mutex);
+    return ret;
+}
+
+int rm_init(int p_count, int r_count, int r_exist[], int avoid) {
+    int i;
+    int ret = 0;
+    DA = avoid;
+    N = p_count;
+    M = r_count;
+    // initialize (create) resources
+    for (i = 0; i < M; ++i)
+        ExistingRes[i] = r_exist[i];
+    // resources initialized (created)
+    return ret;
 }
 
 int rm_request(int request[]) {
-    // Implement the function to handle resource request
-    return 0;
+    int ret = 0;
+    pthread_mutex_lock(&resource_mutex);
+    for (int i = 0; i < M; i++) {
+        if (request[i] < 0 || request[i] > ExistingRes[i]) {
+            ret = -1;
+            break;
+        }
+        Allocation[0][i] += request[i];
+        ExistingRes[i] -= request[i];
+    }
+    pthread_mutex_unlock(&resource_mutex);
+    return ret;
 }
 
 int rm_release(int release[]) {
-    // Implement the function to handle resource release
-    return 0;
+    int ret = 0;
+    pthread_mutex_lock(&resource_mutex);
+    for (int i = 0; i < M; i++) {
+        if (release[i] < 0 || release[i] > Allocation[0][i]) {
+            ret = -1;
+            break;
+        }
+        Allocation[0][i] -= release[i];
+        ExistingRes[i] += release[i];
+    }
+    pthread_mutex_unlock(&resource_mutex);
+    return ret;
 }
 
 int rm_detection() {
-    // Implement the function to detect deadlocks
-    return 0;
+    int ret = 0;
+    // Implement deadlock detection algorithm, if required
+    return ret;
 }
 
-void rm_print_state(char headermsg[]) {
-    // Implement the function to print the current state of the resource manager
+void rm_print_state(char hmsg[]) {
+    printf("%s\n", hmsg);
+    // Implement print state function, if necessary
 }

@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include "rm.h"
 
-#define NUMR 1        // number of resource types
+#define NUMR 1      // number of resource types
 #define NUMP 2        // number of threads
 
 int AVOID = 1;

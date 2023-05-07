@@ -22,6 +22,33 @@ int Maximum[MAXP][MAXR];
 int Need[MAXP][MAXR];
 int Request[MAXP][MAXR];
 
+int rm_init(int p_count, int r_count, int r_exist[], int avoid) 
+{
+    if (p_count <= 0 || p_count > MAXP || r_count <= 0 || r_count > MAXR || (avoid != 0 && avoid != 1)) 
+    {
+        return -1;
+    }
+
+    DA = avoid;
+    N = p_count;
+    M = r_count;
+    printf("INITIALIZATION\n");
+    printf("N: %d\n",N);
+    printf("M: %d\n",M);
+    
+    for (int i = 0; i < M; i++) 
+    {
+        if (r_exist[i] < 0) 
+        {
+            return -1;
+        }
+        ExistingRes[i] = r_exist[i];
+    }
+
+    return 0;
+}
+
+
 int rm_thread_started(int tid) 
 {
     if (tid < 0 || tid >= N) 
@@ -108,24 +135,6 @@ int rm_claim(int claim[])
 }
 
 
-int rm_init(int N, int M, int existing[], int avoid) {
-    if (N <= 0 || N > MAXP || M <= 0 || M > MAXR || (avoid != 0 && avoid != 1)) {
-        return -1;
-    }
-
-    DA = avoid;
-    N = N;
-    M = M;
-    
-    for (int i = 0; i < M; i++) {
-        if (existing[i] < 0) {
-            return -1;
-        }
-        ExistingRes[i] = existing[i];
-    }
-
-    return 0;
-}
 
 int resources_available(int request[M]) 
 {
@@ -428,6 +437,7 @@ void rm_print_state(char headermsg[])
         }
         printf("\n");
     }
+    printf("\n");
 
     // Assuming you have a Request matrix defined and updated in rm_request()
     printf("Request:\nR0 R1\n");
@@ -440,6 +450,7 @@ void rm_print_state(char headermsg[])
         }
         printf("\n");
     }
+    printf("\n");
 
     printf("MaxDemand:\nR0 R1\n");
     for (int i = 0; i < N; ++i) 
@@ -451,6 +462,7 @@ void rm_print_state(char headermsg[])
         }
         printf("\n");
     }
+    printf("\n");
 
     printf("Need:\nR0 R1\n");
     for (int i = 0; i < N; ++i) 
@@ -462,8 +474,9 @@ void rm_print_state(char headermsg[])
         }
         printf("\n");
     }
+    printf("\n");
 
-    printf("##########################\n");
+    //printf("##########################\n");
 
     pthread_mutex_unlock(&resource_mutex);
 }

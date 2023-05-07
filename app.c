@@ -135,19 +135,23 @@ int main(int argc, char **argv)
                     (void*)&tids[i]);
 
     count = 0;
-    while ( count < 10) {
+    while ( count < 10) 
+    {
         sleep(1);
         rm_print_state("The current state");
         ret = rm_detection();
-        if (ret > 0) {
+        if (ret > 0) 
+        {
             printf ("deadlock detected, count=%d\n", ret);
             rm_print_state("state after deadlock");
         }
         count++;
     }
     
-    if (ret == 0) {
-        for (i = 0; i < NUMP; ++i) {
+    if (ret == 0) 
+    {
+        for (i = 0; i < NUMP; ++i) 
+        {
             pthread_join (threadArray[i], NULL);
             printf ("joined\n");
         }

@@ -5,7 +5,7 @@
 #define MAXP 100 // max num of threads supported
 
 int rm_init(int p_count, int r_count,
-            int r_exist[], int avoid);
+int r_exist[], int avoid);
 int rm_thread_started(int tid);
 int rm_thread_ended();
 int rm_claim (int claim[]); // only for avoidance

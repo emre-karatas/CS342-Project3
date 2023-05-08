@@ -6,8 +6,8 @@
 #include <stdarg.h>
 #include "rm.h"
 
-#define NUMR 1      // number of resource types
-#define NUMP 2        // number of threads
+#define NUMR 2      // number of resource types
+#define NUMP 3        // number of threads
 
 int AVOID = 1;
 int exist[1] =  {8};  // resources existing in the system
@@ -16,7 +16,8 @@ void pr (int tid, char astr[], int m, int r[])
 {
     int i;
     printf("thread %d, %s, [", tid, astr);
-    for (i=0; i<m; ++i) {
+    for (i=0; i<m; ++i) 
+    {
         if (i==(m-1))
             printf("%d", r[i]);
         else
@@ -32,7 +33,8 @@ void setarray (int r[MAXR], int m, ...)
     int i;
     
     va_start(valist, m);
-    for (i = 0; i < m; i++) {
+    for (i = 0; i < m; i++) 
+    {
         r[i] = va_arg(valist, int);
     }
     va_end(valist);
@@ -79,7 +81,7 @@ void *threadfunc2 (void *a)
     int claim[MAXR];
 
     tid = *((int*)a);
-    rm_thread_started (tid);
+    rm_thread_started(tid);
 
     setarray(claim, NUMR, 8);
     rm_claim(claim);
@@ -135,6 +137,7 @@ int main(int argc, char **argv)
     {
         sleep(1);
         rm_print_state("The current state");
+        printf("\n");
         ret = rm_detection();
         if (ret > 0) 
         {

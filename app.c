@@ -6,8 +6,8 @@
 #include <stdarg.h>
 #include "rm.h"
 
-#define NUMR 2      // number of resource types
-#define NUMP 3        // number of threads
+#define NUMR 1     // number of resource types
+#define NUMP 2        // number of threads
 
 int AVOID = 1;
 int exist[1] =  {8};  // resources existing in the system

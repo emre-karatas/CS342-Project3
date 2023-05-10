@@ -53,9 +53,6 @@ int rm_init(int p_count, int r_count, int r_exist[], int avoid)
     DA = avoid;
     N = p_count;
     M = r_count;
-    printf("INITIALIZATION\n");
-    printf("N: %d\n",N);
-    printf("M: %d\n",M);
     
     for (int i = 0; i < M; i++) 
     {
@@ -64,8 +61,8 @@ int rm_init(int p_count, int r_count, int r_exist[], int avoid)
             return -1;
         }
         ExistingRes[i] = r_exist[i];
-    }
-
+        Available[i] = r_exist[i];
+    } 
     return 0;
 }
 
@@ -115,7 +112,6 @@ int rm_claim(int claim[])
             break;
         }
     }
-    printf("=======CURRENT TID: %d\n ===================", tid);
     if (tid == -1 || !active_threads[tid]) 
     {
         pthread_mutex_unlock(&resource_mutex);
@@ -130,7 +126,7 @@ int rm_claim(int claim[])
             return -1;
         }
         MaxDemand[tid][i] = claim[i];
-        Need[tid][i] = claim[i] - Allocation[tid][i];
+        Need[tid][i] = MaxDemand[tid][i] - Allocation[tid][i];
     }
 
     pthread_mutex_unlock(&resource_mutex);
@@ -140,7 +136,7 @@ int rm_claim(int claim[])
 
 
 
-int resources_available(int request[M]) 
+int resources_available(int request[]) 
 {
     for (int i = 0; i < M; i++) 
     {
@@ -261,7 +257,7 @@ int rm_request(int request[])
 
     for (int i = 0; i < M; i++) 
     {
-        if (request[i] < 0 || request[i] > ExistingRes[i]) 
+        if (request[i] < 0 || request[i] > Available[i]) 
         {
             pthread_mutex_unlock(&resource_mutex);
             return -1;
@@ -279,8 +275,9 @@ int rm_request(int request[])
     for (int i = 0; i < M; i++) 
     {
         Allocation[tid][i] += request[i];
-        ExistingRes[i] -= request[i];
+        //ExistingRes[i] -= request[i];
         Need[tid][i] -= request[i];
+        Available[i] -= request[i];
     }
 
     pthread_mutex_unlock(&resource_mutex);
@@ -327,8 +324,9 @@ int rm_release(int release[])
     for (int i = 0; i < M; i++) 
     {
         Allocation[tid][i] -= release[i];
-        ExistingRes[i] += release[i];
+        //ExistingRes[i] += release[i];
         Need[tid][i] += release[i];
+        Available[i] += release[i];
     }
 
     // Signal all waiting threads to check if they can continue now
@@ -346,7 +344,6 @@ int rm_detection()
     int deadlock_detected[N];
     int work[M];
     int finish[N];
-
     pthread_mutex_lock(&resource_mutex);
 
     // Initialize the work and finish arrays
@@ -392,7 +389,7 @@ int rm_detection()
                 }
             }
         }
-    } while (found);
+    } while (!found);
 
     // Count the deadlocked threads
     for (int i = 0; i < N; i++) 

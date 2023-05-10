@@ -418,35 +418,37 @@ void rm_print_state(char headermsg[])
     printf("###########################\n");
 
     printf("Exist:\n");
-    printf("  ");
+    printf("   ");
     for (int i = 0; i < M; i++) 
     {
         printf("R%d ", i);
     }
     printf("\n");
-    printf("  ");
+    printf("   ");
     for (int i = 0; i < M; i++) 
     {
-        printf("%d ", ExistingRes[i]);
+        printf("%d  ", ExistingRes[i]);
     }
     printf("\n");
+     printf("\n");
 
     printf("Available:\n");
-    printf("  ");
+    printf("   ");
     for (int i = 0; i < M; i++) 
     {
         printf("R%d ", i);
     }
     printf("\n");
-    printf("  ");
+    printf("   ");
     for (int i = 0; i < M; i++) 
     {
         printf("%d ", Available[i]);
     }
     printf("\n");
+    printf("\n");
 
     printf("Allocation:\n");
-    printf("  ");
+    printf("   ");
     for (int i = 0; i < M; i++) 
     {
         printf("R%d ", i);
@@ -461,9 +463,10 @@ void rm_print_state(char headermsg[])
         }
         printf("\n");
     }
-
+    printf("\n");
+    
     printf("Request:\n");
-    printf("  ");
+    printf("   ");
     for (int i = 0; i < M; i++) 
     {
         printf("R%d ", i);
@@ -478,9 +481,10 @@ void rm_print_state(char headermsg[])
         }
         printf("\n");
     }
-
+    printf("\n");
+    
     printf("MaxDemand:\n");
-    printf("  ");
+    printf("   ");
     for (int i = 0; i < M; i++) 
     {
         printf("R%d ", i);
@@ -495,9 +499,10 @@ void rm_print_state(char headermsg[])
         }
         printf("\n");
     }
-
+    printf("\n");
+    
     printf("Need:\n");
-    printf("  ");
+    printf("   ");
     for (int i = 0; i < M; i++) 
     {
         printf("R%d ", i);
@@ -512,7 +517,7 @@ void rm_print_state(char headermsg[])
         }
         printf("\n");
     }
-
+    printf("\n");
     printf("###########################\n");
 
     pthread_mutex_unlock(&resource_mutex);

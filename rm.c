@@ -262,6 +262,7 @@ int rm_request(int request[])
         }
         if (available == 0) 
         {
+            pthread_mutex_unlock(&resource_mutex);
             pthread_cond_wait(&resource_cond, &resource_mutex); 
         }
     } while (available == 0);
@@ -271,30 +272,26 @@ int rm_request(int request[])
         int safe;
         do 
         {
-            for (int i = 0; i < M; i++) 
-            {
-                Available[i] -= request[i];
-                Allocation[tid][i] += request[i];
-                Need[tid][i] -= request[i];
-                Request[tid][i] = 0;
-            }
+        
             
             safe = is_safe(tid,request);
             
             if (safe) 
             {
+                for (int i = 0; i < M; i++) 
+                {
+                    Available[i] -= request[i];
+                    Allocation[tid][i] += request[i];
+                    Need[tid][i] -= request[i];
+                    Request[tid][i] = 0;
+                }
                 pthread_mutex_unlock(&resource_mutex);
                 return 0;
             }
             else 
             {
-                for (int i = 0; i < M; i++) 
-                {
-                    Available[i] += request[i];
-                    Allocation[tid][i] -= request[i];
-                    Need[tid][i] += request[i];
-                    Request[tid][i] = request[i];
-                }
+                pthread_mutex_unlock(&resource_mutex);
+
                 pthread_cond_wait(&resource_cond, &resource_mutex);
             }
         } while (safe == 0);
@@ -534,5 +531,4 @@ void rm_print_state(char headermsg[]) {
 
     pthread_mutex_unlock(&resource_mutex);
 }
-
 

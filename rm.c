@@ -169,14 +169,6 @@ int is_safe(int tid, int request[])
         finish[i] = 0;
     }
 
-
-    // Temporarily allocate the requested resources
-    for (int i = 0; i < M; i++) 
-    {
-        work[i] -= request[i];
-        Need[tid][i] -= request[i];
-        Allocation[tid][i] += request[i];
-    }
     int found;
     do
     {

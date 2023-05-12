@@ -11,12 +11,12 @@ int M; // number of resource types
 int ExistingRes[MAXR]; // Existing resources vector
 
 int Available[MAXR]; // Available resources vector
-pthread_t threads[MAXP];
-bool active_threads[MAXP];
+pthread_t threads[MAXP];//   to  keep threads.
+bool active_threads[MAXP]; // to keep active threads
 
-pthread_mutex_t resource_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t resource_mutex = PTHREAD_MUTEX_INITIALIZER; // global mutex declaration&initialization
 
-pthread_cond_t resource_cond = PTHREAD_COND_INITIALIZER;
+pthread_cond_t resource_cond = PTHREAD_COND_INITIALIZER; // global cv declaration&initialization
 
 // Additional matrices for deadlock avoidance
 int Allocation[MAXP][MAXR];
@@ -24,6 +24,7 @@ int MaxDemand[MAXP][MAXR];
 int Need[MAXP][MAXR];
 int Request[MAXP][MAXR];
 
+// thread starting function
 int rm_thread_started(int tid) 
 {
     int ret = 0;
@@ -42,7 +43,7 @@ int rm_thread_started(int tid)
     return (ret);
 }
 
-
+// rm initializing func.
 int rm_init(int p_count, int r_count, int r_exist[], int avoid) 
 {
     int ret = 0;
@@ -68,7 +69,7 @@ int rm_init(int p_count, int r_count, int r_exist[], int avoid)
 }
 
 
-
+// rm thread ending function
 int rm_thread_ended() 
 {
     pthread_t current_thread = pthread_self();

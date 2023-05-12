@@ -104,9 +104,12 @@ int rm_claim(int claim[])
 {
     pthread_t current_thread = pthread_self();
     int tid = -1;
-    int ret = 0;
-
-    pthread_mutex_lock(&resource_mutex);
+    
+    if (pthread_mutex_lock(&resource_mutex) != 0) 
+    {
+        perror("pthread_mutex_lock");
+        return -1;
+    }
 
     for (int i = 0; i < N; i++) 
     {
@@ -116,10 +119,11 @@ int rm_claim(int claim[])
             break;
         }
     }
+
     if (tid == -1 || !active_threads[tid]) 
     {
         pthread_mutex_unlock(&resource_mutex);
-        ret = -1;
+        return -1;
     }
 
     for (int i = 0; i < M; i++) 
@@ -127,16 +131,20 @@ int rm_claim(int claim[])
         if (claim[i] < 0 || claim[i] > ExistingRes[i]) 
         {
             pthread_mutex_unlock(&resource_mutex);
-            ret=-1;
+            return -1;
         }
         MaxDemand[tid][i] = claim[i];
-        Need[tid][i]=  claim[i];
+        Need[tid][i] = claim[i];
     }
 
-    pthread_mutex_unlock(&resource_mutex);
+    if (pthread_mutex_unlock(&resource_mutex) != 0) {
+        perror("pthread_mutex_unlock");
+        return -1;
+    }
 
-    return (ret);
+    return 0;
 }
+
 
 
 
@@ -298,11 +306,11 @@ int rm_request(int request[])
     }
     else 
     {
-        //printf("\nAA\n");
         for (int i = 0; i < M; i++) 
         {
             Available[i] -= request[i];
             Allocation[tid][i] += request[i];
+            Need[tid][i] = MaxDemand[tid][i] - Allocation[tid][i];  
             Request[tid][i] = 0;
         }
         pthread_mutex_unlock(&resource_mutex);

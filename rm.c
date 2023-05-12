@@ -135,7 +135,7 @@ int rm_claim(int claim[])
             return -1;
         }
         MaxDemand[tid][i] = claim[i];
-        Need[tid][i] = MaxDemand[tid][i] - Allocation[tid][i];
+        Need[tid][i] = claim[i];
     }
 
     if (pthread_mutex_unlock(&resource_mutex) != 0) {

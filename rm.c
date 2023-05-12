@@ -135,7 +135,7 @@ int rm_claim(int claim[])
             return -1;
         }
         MaxDemand[tid][i] = claim[i];
-        Need[tid][i] = claim[i];
+        Need[tid][i] = MaxDemand[tid][i] - Allocation[tid][i];
     }
 
     if (pthread_mutex_unlock(&resource_mutex) != 0) {
@@ -279,12 +279,10 @@ int rm_request(int request[])
     if (DA) 
     {
         int safe;
+        int condition_signaled = 0; // new flag to track whether the condition was signaled
         do 
         {
-        
-            
             safe = is_safe(tid,request);
-            
             if (safe) 
             {
                 for (int i = 0; i < M; i++) 
@@ -299,27 +297,32 @@ int rm_request(int request[])
             }
             else 
             {
+                // unlock mutex before waiting on condition variable
                 pthread_mutex_unlock(&resource_mutex);
+                pthread_cond_wait(&resource_cond, &resource_mutex); 
 
-                pthread_cond_wait(&resource_cond, &resource_mutex);
+                // set flag to true if condition variable was signaled
+                if (condition_signaled) {
+                    available = 0;
+                }
             }
-        } while (safe == 0);
+        } while (safe == 0 && available == 0);
     }
     else 
     {
+        
         for (int i = 0; i < M; i++) 
         {
             Available[i] -= request[i];
             Allocation[tid][i] += request[i];
-            Need[tid][i] = MaxDemand[tid][i] - Allocation[tid][i];  
             Request[tid][i] = 0;
         }
         pthread_mutex_unlock(&resource_mutex);
         return 0;
     }
     return 0;
-
 }
+
 
 
 int rm_release(int release[]) 
